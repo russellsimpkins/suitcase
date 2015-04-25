@@ -1,4 +1,7 @@
 #!/bin/sh -x
+
+yum install -y cloud-init
+
 if [ "${os_version::1}" == "7" ]; then
     systemctl enable cloud-config
     systemctl enable cloud-final

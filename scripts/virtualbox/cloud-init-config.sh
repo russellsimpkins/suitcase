@@ -1,5 +1,5 @@
 #!/bin/sh -x
-
+mkdir -p /etc/cloud
 cat > /etc/cloud/cloud.cfg << EOF
 system_info:
     distro: 'rhel'

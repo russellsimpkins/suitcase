@@ -8,112 +8,127 @@ auth --useshadow --passalgo=sha256
 selinux --disabled
 firewall --disabled
 firstboot --disable
+services --enabled=NetworkManager,sshd
+eula --agreed
+ignoredisk --only-use=sda
 text
 reboot
+
+bootloader --location=mbr --timeout=1
+zerombr
+clearpart --all --initlabel
+part swap --asprimary --fstype="swap" --size=1024
+part /boot --fstype xfs --size=200
+part pv.01 --size=1 --grow
+volgroup rootvg01 pv.01
+logvol / --fstype xfs --name=lv01 --vgname=rootvg01 --size=1 --grow
+
+##ignoredisk --only-use=sda
+# Leave room for disk partition info.
+##part / --grow --fstype xfs --label _/
 
 rootpw --lock --iscrypted $1$0000000000000000000000000000000
 # FIXME: Installer bug
 # Add dummy user to keep installer from failing.
 user --name=hsimage --plaintext --password hsimage
 
-bootloader --location=mbr --timeout=1
-network --bootproto=dhcp --device=link --activate --onboot=on
+
+##network --bootproto=dhcp --device=link --activate --onboot=on
 
 # Partition Information. Change this as necessary
 # This information is used by appliance-tools but
 # not by the livecd tools.
 #
-zerombr
-clearpart --all
-ignoredisk --only-use=sda
-# Leave room for disk partition info.
-part / --grow --fstype xfs --label _/
 
 # Repositories
-#repo --cost=1000 --name=CentOS7-Base --mirrorlist=http://mirrorlist.centos.org/?release=7.0&arch=x86_64&repo=os
-repo --cost=1000 --name=CentOS7-Updates --mirrorlist=http://mirrorlist.centos.org/?release=7.0&arch=x86_64&repo=updates
+##repo --cost=1000 --name=CentOS7-Base --mirrorlist=http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=os
+##repo --cost=1000 --name=CentOS7-Updates --mirrorlist=http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=updates
 
-repo --cost=1000 --name=EPEL --baseurl=http://dl.fedoraproject.org/pub/epel/7/x86_64/
-repo --cost=1 --name=Puppet-prod --baseurl=http://yum.puppetlabs.com/el/7/products/x86_64/
-repo --cost=1 --name=Puppet-deps --baseurl=http://yum.puppetlabs.com/el/7/dependencies/x86_64/
+##repo --cost=1000 --name=EPEL --baseurl=http://dl.fedoraproject.org/pub/epel/7/x86_64/
+##repo --cost=1 --name=Puppet-prod --baseurl=http://yum.puppetlabs.com/el/7/products/x86_64/
+##repo --cost=1 --name=Puppet-deps --baseurl=http://yum.puppetlabs.com/el/7/dependencies/x86_64/
 
 
 # Add all the packages after the base packages
-%packages
+%packages --nobase --ignoremissing
 @core
-@base
-ack
-dos2unix
-dstat
-git
-htop
-iftop
-lynx
-nc
 nscd
-# Use sssd eventually
-nss-pam-ldapd
-openldap-clients
-rsync
-s3cmd
-screen
-tmux
-yum-utils
-yum-plugin-changelog
-yum-plugin-downloadonly
-yum-plugin-ps
-
-redhat-lsb
-
-# Use standard NTP.
-# FIXME: we have no NTP resource in Puppet which seems like a bad idea to me...
--chrony
-ntp
-
-# Install kernel related packages. Used for VBox Guest Additions.  Not sure
-# if elsewhere.
-kernel-devel
-kernel-headers
-
-# cloud-init
-cloud-init
-
-# Puppet
-# We use our own mirror during cloud-init but we need the key from this
-# package.
-puppetlabs-release
-facter-2.3.0-1.el7
-puppet-3.7.3-1.el7
-
-# This could be removed but would need a Puppet update to get keys from the
-# internet.
-epel-release
-
-# Pulled in for Virtual Box.
-gcc
-
-#NOTE: abrt may be worthwhile for kernel panics if we invest some time into
-# learning and using it.
--abrt-*
--avahi
--crda
--dmraid
--fprintd-*
--hunspell-*
--ledmon
--libertas-*-firmware
--libreport-*
--libstoragemgmt
--lvm2
--iwl*-firmware
--ntsysv
--rubygem-abrt
--setuptool
--smartmontools
--usb_modeswitch-*
--yum-langpacks
-
 %end
+
+
+###@base
+###ack
+###dos2unix
+###dstat
+###git
+###htop
+###iftop
+###lynx
+###nc
+###nscd
+#### Use sssd eventually
+###nss-pam-ldapd
+###openldap-clients
+###rsync
+###s3cmd
+###screen
+###tmux
+###yum-utils
+###yum-plugin-changelog
+###yum-plugin-downloadonly
+###yum-plugin-ps
+### 
+###redhat-lsb
+### 
+#### Use standard NTP.
+#### FIXME: we have no NTP resource in Puppet which seems like a bad idea to me...
+###-chrony
+###ntp
+### 
+#### Install kernel related packages. Used for VBox Guest Additions.  Not sure
+#### if elsewhere.
+###kernel-devel
+###kernel-headers
+### 
+#### cloud-init
+###cloud-init
+### 
+#### Puppet
+#### We use our own mirror during cloud-init but we need the key from this
+#### package.
+###puppetlabs-release
+###facter-2.3.0-1.el7
+###puppet-3.7.3-1.el7
+### 
+#### This could be removed but would need a Puppet update to get keys from the
+#### internet.
+###epel-release
+### 
+#### Pulled in for Virtual Box.
+###gcc
+### 
+####NOTE: abrt may be worthwhile for kernel panics if we invest some time into
+#### learning and using it.
+###-abrt-*
+###-avahi
+###-crda
+###-dmraid
+###-fprintd-*
+###-hunspell-*
+###-ledmon
+###-libertas-*-firmware
+###-libreport-*
+###-libstoragemgmt
+###-lvm2
+###-iwl*-firmware
+###-ntsysv
+###-rubygem-abrt
+###-setuptool
+###-smartmontools
+###-usb_modeswitch-*
+###-yum-langpacks
+###
+###%end
 
 # Ensure updates repo is disabled.
 %post

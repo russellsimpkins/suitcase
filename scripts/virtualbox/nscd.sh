@@ -1,8 +1,9 @@
 #/bin/sh
 
+/usr/bin/yum install -y nscd
 # ensure nscd is enabled for boot
 if [ "${os_version::1}" == "7" ]; then
-    systemctl enable nscd
+    echo /usr/bin/systemctl enable nscd
 else
-    chkconfig nscd on
+    echo chkconfig nscd on
 fi

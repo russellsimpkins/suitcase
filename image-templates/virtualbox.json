@@ -76,10 +76,6 @@
       "type"       : "file",
       "source"     : "tests",
       "destination": "/tmp"
-    },
-    {
-      "type"   : "shell",
-      "script" : "tests/serverspec.sh"
     }
   ]
 }

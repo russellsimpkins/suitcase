@@ -2,7 +2,7 @@
 
 if [ "$AWS_TYPE" = "paravirt" ]; then
     console="console=hvc0"
-
+    mkdir -p /boot/grub
     # CentOS 7 comes with GRUB 2 so we need to just create our own file.
     if [ "${os_version::1}" = "7" ]; then
         cat << EOF > /boot/grub/grub.conf

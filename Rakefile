@@ -18,9 +18,9 @@ S3_AWS_HVM = "#{S3_BUCKET}/aws-hvm"
 S3_AWS_PV  = "#{S3_BUCKET}/aws-pv"
 
 if RUBY_PLATFORM =~ /.*darwin.*/
-  packer_cmd = '/usr/local/bin/packer'
+  packer_cmd = '~/software/packer/packer'
 else
-  packer_cmd = '~/bin/packer'
+  packer_cmd = '/usr/local/packer/packer'
 end
 
 $command = { 'packer' => packer_cmd }
@@ -243,7 +243,7 @@ namespace :packer do
   desc "Upload AWS HVM image"
   task :upload_awshvm => :build_awshvm do
     unless FileUtils.uptodate?("#{aws_hvm_upload_done}", ["#{aws_hvm_image}"])
-      sh %{aws --profile #{AWS_PROFILE} s3 cp --recursive #{File.dirname("#{aws_hvm_image}")} #{S3_AWS_HVM}/#{File.basename(File.dirname("#{aws_hvm_image}"))}}
+      sh %{aws --profile #{AWS_PROFILE} AWS_ACCESS_KEY=$AWS s3 cp --recursive #{File.dirname("#{aws_hvm_image}")} #{S3_AWS_HVM}/#{File.basename(File.dirname("#{aws_hvm_image}"))}}
       FileUtils.touch("#{aws_hvm_upload_done}")
     end
   end
